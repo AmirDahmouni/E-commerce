@@ -27,7 +27,7 @@ export default function Header()
               
               {!userInfo.isAdmin && 
                   <React.Fragment><img src={points} height="35" width="35"/>
-                                  <a href="/cart">{userInfo.points}</a> </React.Fragment>  }
+                                  <Link to="/cart">{userInfo.points}</Link> </React.Fragment>  }
               <Link to="/profile">{userInfo.name}</Link>
               </>
             ) : (

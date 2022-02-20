@@ -1,46 +1,59 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { detailsOrder, payOrder,payOrderByPoints} from '../actions/orderActions';
+import { detailsOrder, payOrder,payOrderByPoints,payShipping} from '../actions/orderActions';
 import PaymentButton from '../utils/PaymentButton';
 import points from "../utils/points.png"
 import {USER_DECREMENT_POINTS} from "../constants/userConstants"
 import {ORDER_PAY_RESET} from "../constants/orderConstants"
 import {resetCart} from "../actions/cartActions";
+import {USER_INCREMENT_POINTS} from "../constants/userConstants"
 
 function OrderScreen(props) {
 
   const userSignin = useSelector((state) => state.userSignin);
   const { userInfo } = userSignin;
 
-  const cart = useSelector(state => state.cart);
-  const { cartItems } = cart;
+  const orderDetails = useSelector(state => state.orderDetails);
+  const { loading, order, error } = orderDetails;
 
   const orderPay = useSelector(state => state.orderPay);
   const { loading: loadingPay, success: successPay, error: errorPay } = orderPay;
   const dispatch = useDispatch();
+
   
   useEffect(() => {
     if (successPay) {
       dispatch({type:ORDER_PAY_RESET})
-      console.log("order screen")
       props.history.push("/profile");
     } else {
       dispatch(detailsOrder(props.match.params.id));
+      
     }
     return () => {
     };
   }, [successPay]);
 
   const handleSuccessPayment = (paymentResult) => {
-    console.log(order,paymentResult)
-    dispatch(payOrder(order, paymentResult))
     
+    if(order.payment.paymentMethod=="card")
+    {
+      const points=Math.round(order.orderItems.reduce((a, c) => a + Number(c.price*c.qty), 0)*27/100)
+      console.log(points)
+      dispatch({type:USER_INCREMENT_POINTS,payload:points})
+      dispatch(payOrder(order, paymentResult))
+    }
+    else if(order.payment.paymentMethod=="points")
+    {  
+      const pointsProducts=order.orderItems.reduce((a, c) => a + Number(c.points_price * c.qty), 0)
+      dispatch({type:USER_DECREMENT_POINTS,payload:pointsProducts})
+      dispatch(payShipping(order,{...paymentResult,pointsProducts}))
+    }
     dispatch(resetCart())
   }
 
   const handlePayment=()=>{
-    const points=cartItems.reduce((a, c) => a + Number(c.points_price * c.qty), 0)
+    const points=order.orderItems.reduce((a, c) => a + Number(c.points_price * c.qty), 0)
     const paymentResult={
         payerID:userInfo._id ,
         orderID: order._id,
@@ -52,8 +65,9 @@ function OrderScreen(props) {
     dispatch(resetCart())
   }
 
-  const orderDetails = useSelector(state => state.orderDetails);
-  const { loading, order, error } = orderDetails;
+ 
+
+  
 
   return loading ? <div>Loading ...</div> : error ? <div>{error}</div> :
 

@@ -8,7 +8,7 @@ import { PRODUCT_REVIEW_SAVE_RESET } from '../constants/productConstants';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from 'react-responsive-carousel';
 import ReactStars from "react-rating-stars-component";
-import Image from 'react-image-resizer';
+
 
 function ProductScreen(props) {
 

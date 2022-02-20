@@ -33,7 +33,7 @@ exports.getTop=async(req,res,next)=>{
   try{
     const products = await Product.find().sort({"sold":-1}).limit(10);
     //return products
-    res.send(products);
+    return res.status(200).send(products);
   }
   catch(ex)
   {
@@ -45,7 +45,7 @@ exports.getById=async (req, res,next) => {
     try{
     const product = await Product.findOne({ _id: req.params.id });
     if (product) {
-      res.send(product);
+      res.status(200).send(product);
     } else {
       res.status(404).send({ message: 'Product Not Found.' });
     }

@@ -3,7 +3,6 @@ const config = require('config');
 const fileUpload = require('express-fileupload')
 
 
-
 //import routes
 const userRoute=require("./routes/userRoute");
 const productRoute =require('./routes/productRoute');
@@ -14,8 +13,6 @@ const {uploadRoute}=require('./routes/uploadRoute');
 const express = require('express')
 const app = express();
 
-
-
 //connection to MongoDb
 
 mongoose.connect(config.get("MONGODB_URL"), {
@@ -25,18 +22,19 @@ mongoose.connect(config.get("MONGODB_URL"), {
   })
   .catch((error) => console.log(error.reason));
 
-//routes declaration
+//appel au middlewares 
 
 app.use(fileUpload({useTempFiles: true}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
+//declaration APIs
 
 app.use('/api/uploads', uploadRoute);
 app.use('/api/users', userRoute);
 app.use('/api/products', productRoute);
 app.use('/api/orders', orderRoute);
-app.use('/api/payment',paymentRoute );
+app.use('/api/payment',paymentRoute);
 
 
 // server listening

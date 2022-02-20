@@ -37,7 +37,6 @@ function HomeScreen(props) {
     
     if(userInfo)
     dispatch(onlinelistProducts())
-    console.log(topProductsList)
   },[])
 
   useEffect(() => {

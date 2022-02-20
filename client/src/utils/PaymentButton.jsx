@@ -12,7 +12,7 @@ function PaymentButton(props) {
   const { userInfo } = userSignin;
 
   const [product, setproduct] = useState({
-    price:props.order.totalPrice*100,
+    price:parseInt(props.order.totalPrice),
     shipping:props.order.shipping,
     
   });
@@ -27,7 +27,6 @@ function PaymentButton(props) {
     const body={product,token:Token};
     try{
       const {data} = await axios.post("/api/payment",body)
-      console.log(data)
       const paymentResult={
         payerID:Token.id ,
         orderID: props.order._id,
@@ -43,7 +42,7 @@ function PaymentButton(props) {
   }
     return <StripeCheckout 
     currency="USD"
-    amount={product.price}
+    amount={product.price*100}
     name="Stripe"
     token={makePayment}
     stripeKey="pk_test_51J5pbGAJx5tuHbI4hJuzouvJy87Ok9Enu1rks5ETwJevsdZimG30PtiJ2iQyjpBu5LGwkkvxjG5LuXZFTRuoIAGI00dF6LJrAu" >

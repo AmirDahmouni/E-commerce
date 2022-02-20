@@ -7,7 +7,7 @@ exports.getAll=async (req,res,next)=>{
       try{
         const orders = await Order.find({}).populate('user');
         //return orders
-        res.send(orders);
+        return res.status(200).send(orders);
       }
       catch(ex)
       {
@@ -19,7 +19,7 @@ exports.getByUser=async (req, res,next) => {
   try {
     const orders = await Order.find({ user: req.user._id });
     //return orders
-    res.send(orders);
+    return res.status(200).send(orders);
   }
   catch(ex)
   {
@@ -33,7 +33,7 @@ exports.getById=async (req, res,next) => {
     const order = await Order.findOne({ _id: req.params.id });
     if (order) {
       //return order
-      res.send(order);
+      return res.status(200).send(order);
     } else {
       res.status(404).send("Order Not Found.")
     }
@@ -53,7 +53,7 @@ exports.removeById=async (req, res,next) => {
     if (order) {
       const deletedOrder = await order.remove();
       //return deleted Order
-      res.send(deletedOrder);
+      return res.status(200).send(deletedOrder);
     } else {
       //order not found
       res.status(404).send("Order Not Found.")
@@ -68,7 +68,7 @@ exports.removeById=async (req, res,next) => {
 //create new Order
 exports.create=async (req, res,next) => {
     try{
-      console.log("create new order")
+    
     const newOrder = new Order({
       orderItems: req.body.orderItems,
       user: req.user._id,
@@ -84,13 +84,7 @@ exports.create=async (req, res,next) => {
       shippingPrice: req.body.shippingPrice,
       totalPrice: req.body.totalPrice,
     });
-    const pointsbonus= Math.round(Number(req.body.itemsPrice)/100*27)
     
-    if(req.body.pay=="card")
-    {  
-    const currentUser=await User.findByIdAndUpdate(req.user._id,{$inc:{points:pointsbonus}})
-    await currentUser.save()
-    }
     const newOrderCreated = await newOrder.save();
     if(!newOrderCreated) return res.status(404).send("Order Not Created")
     return res.status(200).send({ message: "New Order Created", data: newOrderCreated });
@@ -116,7 +110,12 @@ exports.pay=async (req, res,next) => {
           paymentID: req.body.paymentID
       }
       const updatedOrder = await order.save();
-
+      
+      const pointsbonus= Math.round(Number(order.itemsPrice)/100*27)
+      
+      const currentUser=await User.findByIdAndUpdate(req.user._id,{$inc:{points:pointsbonus}})
+    
+      await currentUser.save()
       //inc sold of items in product Model
     
       Promise.all(updatedOrder.orderItems.map(async (item)=>{
@@ -125,7 +124,47 @@ exports.pay=async (req, res,next) => {
       }))
       
     
-      res.send({ message: 'Order Paid by card.', order: updatedOrder });
+      return res.status(200).send({ message: 'Order Paid by card.', order: updatedOrder });
+      
+    } else {
+      res.status(404).send({ message: 'Order not found.' })
+    }
+  }
+    catch(ex)
+    {
+      next(ex.message)
+    }
+}
+
+exports.payShipping=async (req, res,next) => {
+  try{
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      order.isDelivered=true;
+      order.isPaid = true;
+      order.deliveredAt=Date.now();
+      order.paidAt = Date.now();
+      order.payment = {
+          paymentMethod: "points-shipping",
+          payerID: req.body.payerID,
+          orderID: req.body.orderID,
+          paymentID: req.body.paymentID
+      }
+      const updatedOrder = await order.save();
+      
+      console.log(req.body)
+      const currentUser=await User.findByIdAndUpdate(req.user._id,{$inc:{points:-req.body.pointsProducts}})
+    
+      await currentUser.save()
+      //inc sold of items in product Model
+    
+      Promise.all(updatedOrder.orderItems.map(async (item)=>{
+        let id=item.product
+        await Product.findByIdAndUpdate({_id:id},{ $inc: {sold:1}  })
+      }))
+      
+    
+      return res.status(200).send({ message: 'Order Paid by card.', order: updatedOrder });
       
     } else {
       res.status(404).send({ message: 'Order not found.' })
@@ -151,7 +190,7 @@ exports.payByPoints=async (req, res,next) => {
           orderID: req.body.orderID,
           paymentID: req.body.paymentID
       }
-      //const newpoints=req.user.points-req.body.points
+     
       const currentUser=await User.findByIdAndUpdate(req.user._id,{$inc:{points:-req.body.points}})
     
       await currentUser.save()

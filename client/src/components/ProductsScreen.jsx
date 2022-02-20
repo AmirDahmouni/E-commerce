@@ -102,7 +102,7 @@ function ProductsScreen(props) {
       .then((response) => {
         
         newimages.push(response.data)
-        console.log(response.data)
+        
         
         
         setUploading(false);
@@ -113,7 +113,7 @@ function ProductsScreen(props) {
       });
     })
     setImages(newimages);
-    console.log(newimages)
+    
       
     
     

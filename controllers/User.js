@@ -15,7 +15,7 @@ exports.createAdmin=async (req, res,next) => {
       user.password = await bcrypt.hash("123", salt);
   
       const newUser = await user.save();
-      res.status(200).send(newUser);
+      return res.status(201).send(newUser);
     } catch (ex) {
       next(ex.message)
     }
@@ -27,7 +27,7 @@ exports.register= async (req, res,next) => {
     let user = await User.findOne({
       email: req.body.email
     });
-    if (user) return res.status(404).send({ message: 'invalid username' });
+    if (user) return res.status(400).send({ message: 'invalid email' });
     
     if(req.body.password!==req.body.rePassword) return res.status(400).send({message:"invalid rePassword "})
     user = new User({
@@ -69,7 +69,7 @@ exports.signin=async (req, res,next) => {
   const signinUser = await User.findOne({
     email: req.body.email
   });
-  if (!signinUser) return res.status(404).send({ message: 'invalid username' });
+  if (!signinUser) return res.status(404).send({ message: 'invalid email' });
   const validpassword = await bcrypt.compare(req.body.password, signinUser.password)
   if(!validpassword) return res.status(401).send({ message: 'Invalid Password.' });
   
@@ -90,9 +90,8 @@ exports.signin=async (req, res,next) => {
 
 exports.update= async (req, res,next) => {
   try{
-  console.log(req.user)
+  
   const userId = req.params.id;
-  console.log(userId)
   const user = await User.findById(userId);
   if (user) {
     const salt = await bcrypt.genSalt(10);
@@ -125,7 +124,7 @@ exports.clearCache=async(req,res,next)=>{
   try{
    
     const user=await User.findByIdAndUpdate({_id:req.user._id},{favoris:[]})
-    return res.send(user)
+    return res.status(200).send(user)
   }
   catch(ex)
   {

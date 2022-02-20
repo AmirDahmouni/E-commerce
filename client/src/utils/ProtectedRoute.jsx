@@ -13,8 +13,7 @@ function ProtectedRoute({ component: Component, ...restOfProps }) {
       render={(props) =>
         {
             
-            if((props.location.pathname=="/products" ||
-                props.location.pathname=="/orders") 
+            if((props.location.pathname=="/products" || props.location.pathname=="/orders") 
                 && !userInfo.isAdmin) return <Redirect to="/signin" />
             else if(userInfo) return <Component {...props} />
             else return <Redirect to="/signin" />

@@ -13,6 +13,7 @@ router.get("/categories",productController.getCategories,error)
 router.get("/cache/:id",isAuth,productController.createCache,error)
 router.get('/:id',productController.getById,error);
 router.post('/:id/reviews', isAuth,productController.addReview,error );
+
 router.put('/:id', isAuth, isAdmin, productController.update,error);
 router.delete('/:id', isAuth, isAdmin,productController.remove,error );
 router.post('/', isAuth, isAdmin,productController.create,error);

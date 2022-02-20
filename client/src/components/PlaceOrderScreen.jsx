@@ -4,9 +4,8 @@ import { Link } from 'react-router-dom';
 import CheckoutSteps from '../utils/CheckoutSteps';
 import { createOrder } from '../actions/orderActions';
 import points from "../utils/points.png"
-import {USER_INCREMENT_POINTS} from "../constants/userConstants"
 import {ORDER_RESET} from "../constants/orderConstants"
-
+import {resetCart } from "../actions/cartActions";
 function PlaceOrderScreen(props) {
 
   const cart = useSelector(state => state.cart);
@@ -21,14 +20,10 @@ function PlaceOrderScreen(props) {
   }
   
   const itemsPrice = (payment.paymentMethod!="points") ? (cartItems.reduce((a, c) => a + c.price * c.qty, 0)) : 0
-       
-
   const shippingPrice = (payment.paymentMethod!="points") ? (itemsPrice > 1000 ? 0 : 10) : ((cartItems.reduce((a, c) => a + c.points_price * c.qty, 0)) > 1800 ? 0: 10)
   const taxPrice = (payment.paymentMethod!="points") ? 0.15 * itemsPrice : 0
   const totalPrice = (payment.paymentMethod!="points") ? (itemsPrice + shippingPrice + taxPrice) : shippingPrice
   
-  
-
   const dispatch = useDispatch();
 
   const placeOrderHandler = () => {
@@ -38,17 +33,11 @@ function PlaceOrderScreen(props) {
       orderItems: cartItems, shipping, pay, itemsPrice, shippingPrice,
       taxPrice, totalPrice
     }));
-    if(payment.paymentMethod=="card")
-    {
-     const points= Math.round(cartItems.reduce((a, c) => a + Number(c.price*c.qty), 0)/100*27)
-     console.log(points) 
-     dispatch({type:USER_INCREMENT_POINTS,payload:points})
-    }
+    
   }
   useEffect(() => {
     if (success) {
       
-      console.log("success")
       dispatch({type:ORDER_RESET})
       
       props.history.push("order/" + order._id);
@@ -116,8 +105,6 @@ function PlaceOrderScreen(props) {
             }
           </ul>
         </div>
-
-      
       </div>
       <div className="placeorder-action">
         <ul>
@@ -155,15 +142,9 @@ function PlaceOrderScreen(props) {
              </div>
              </>
             }
-            
-            
           </li>
         </ul>
-
-
-
       </div>
-
     </div>
   </div>
 

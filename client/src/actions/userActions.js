@@ -6,7 +6,6 @@ import {
   USER_REGISTER_SUCCESS, USER_REGISTER_FAIL, 
   USER_LOGOUT, USER_UPDATE_REQUEST,
    USER_UPDATE_SUCCESS, USER_UPDATE_FAIL, USER_CLEAR_CACHE_REQUEST, USER_CLEAR_CACHE_SUCCESS,USER_CLEAR_CACHE_ERROR
-
 } from "../constants/userConstants";
 
 const update = ({ userId, name, email, password }) => async (dispatch, getState) => {
@@ -55,9 +54,7 @@ const register = (name, email, password,rePassword) => async (dispatch) => {
 const clearCache=(token)=>async(dispatch, getState)=>{
   const { userSignin: { userInfo } } = getState();
   dispatch({type:USER_CLEAR_CACHE_REQUEST});
-  
   try{
-    //console.log(token)
     const { data } = await Axios.put("/api/users/clearcache/",{},{headers: {
       authorization: token}
     })

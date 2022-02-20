@@ -6,7 +6,7 @@ const stripe=require("stripe")(config.get("STRIPE"))
 
 
 router.post("/",(req, res,next) => {
-    
+    console.log(req.body)
     const {product,token}=req.body;
     stripe.customers.create({
       email: token.email,
