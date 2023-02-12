@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { savePayment } from '../actions/cartActions';
 import CheckoutSteps from '../utils/CheckoutSteps';
 
 function PaymentScreen(props) {
-  const [paymentMethod, setPaymentMethod] = useState('');
- 
-
 
   const cart = useSelector(state => state.cart);
   const { cartItems } = cart;
 
   const userSignin = useSelector((state) => state.userSignin);
-
   const { userInfo:{points} } = userSignin;
+  
+  const [paymentMethod, setPaymentMethod] = useState('');
 
   const dispatch = useDispatch();
 

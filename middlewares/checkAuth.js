@@ -1,6 +1,5 @@
 
 const jwt=require('jsonwebtoken');
-const config = require('config');
 
 // middleware :check Authentification
 module.exports=function (req, res, next){
@@ -12,7 +11,7 @@ module.exports=function (req, res, next){
       //const onlyToken = token.slice(7, token.length);
       //decode json web token
       
-      jwt.verify(token, config.get("JWT_SECRET") , (err, decode) => {
+      jwt.verify(token, process.env.JWT_SECRET , (err, decode) => {
         
         if (err) {
           console.log("erreur")

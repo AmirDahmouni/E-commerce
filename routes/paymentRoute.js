@@ -1,12 +1,10 @@
 const express = require('express')
 const error = require("../middlewares/error")
 const router = express.Router();
-const config = require("config");
-const stripe=require("stripe")(config.get("STRIPE"))
+const stripe=require("stripe")(process.env.STRIPE)
 
 
 router.post("/",(req, res,next) => {
-    console.log(req.body)
     const {product,token}=req.body;
     stripe.customers.create({
       email: token.email,

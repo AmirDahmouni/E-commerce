@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const config=require("config")
 const jwt=require('jsonwebtoken');
 
 const userSchema = new mongoose.Schema({
@@ -24,7 +23,7 @@ userSchema.methods.generateAuth = function () {
       isAdmin: this.isAdmin,
       points:this.points
     },
-    config.get("JWT_SECRET"),
+    process.env.JWT_SECRET,
     {
       expiresIn: '48h',
     }

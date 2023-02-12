@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
-const config = require('config');
 const fileUpload = require('express-fileupload')
-
+require('dotenv').config();
 
 //import routes
 const userRoute=require("./routes/userRoute");
@@ -15,12 +14,13 @@ const app = express();
 
 //connection to MongoDb
 
-mongoose.connect(config.get("MONGODB_URL"), {
+mongoose.connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
   })
-  .catch((error) => console.log(error.reason));
+  .then(res => console.log("connected to DB ..."))
+  .catch((error) => console.log(error));
 
 //appel au middlewares 
 
@@ -38,6 +38,6 @@ app.use('/api/payment',paymentRoute);
 
 
 // server listening
-app.listen(config.get("PORT"), () => {
-  console.log(`Server started at http://localhost:${config.PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server started at http://localhost:${process.env.PORT}`);
 });
